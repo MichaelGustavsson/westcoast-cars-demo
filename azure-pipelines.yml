@@ -5,6 +5,9 @@ trigger:
 pool:
  vmImage: ubuntu-latest
 
+variables:
+  buildConfiguration: 'Release'
+
 steps:
   - task: DotNetCoreCLI@2
     displayName: 'Restoring dependencies'
@@ -17,7 +20,7 @@ steps:
     displayName: 'Build the project'
     inputs:
       command: build # dotnet build --no-restore --configuration Release
-      arguments: '--no-restore --configuration Release'
+      arguments: '--no-restore --configuration $(buildConfiguration)'
       projects: '**/*.csproj'
 
 # Publish the project(create an artifact)
@@ -27,7 +30,7 @@ steps:
       command: publish #dotnet publish --no-restore --configuration Release --output $(???)/Release
       projects: '**/*.csproj'
       publishWebProjects: false
-      arguments: '--no-restore --configuration Release --output $(Build.ArtifactStagingDirectory)/Release'
+      arguments: '--no-restore --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
       zipAfterPublish: true
 
 # Publish the artifact to our drop folder
@@ -53,4 +56,4 @@ steps:
       azureSubscription: 'westcoastconnection'
       appType: webApp
       WebAppName: 'westcoast-cars'
-      package: '$(Build.ArtifactStagingDirectory)/Release/*.zip' 
+      package: '$(Build.ArtifactStagingDirectory)/$(buildConfiguration)/*.zip' 
